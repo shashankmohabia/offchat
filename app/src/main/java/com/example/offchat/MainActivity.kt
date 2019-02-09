@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.wifi.WifiManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -15,6 +16,14 @@ class MainActivity : AppCompatActivity() {
 
         init()
 
+        setupOnclickListeners()
+
+    }
+
+    private fun setupOnclickListeners() {
+        onOff.setOnClickListener {
+            wifiManager.isWifiEnabled = !wifiManager.isWifiEnabled
+        }
     }
 
     private fun init() {
