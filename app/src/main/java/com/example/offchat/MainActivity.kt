@@ -38,6 +38,19 @@ class MainActivity : AppCompatActivity() {
                 onOff.text = "Wifi Off"
             }
         }
+
+        discover.setOnClickListener {
+            wifiP2pManager.discoverPeers(wifiP2pChannel, object : WifiP2pManager.ActionListener {
+
+                override fun onSuccess() {
+                    connectionStatus.text = "Discovery Started"
+                }
+
+                override fun onFailure(reasonCode: Int) {
+                    connectionStatus.text = "Discovery Failed"
+                }
+            })
+        }
     }
 
     private fun init() {
