@@ -21,8 +21,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupOnclickListeners() {
+
         onOff.setOnClickListener {
-            wifiManager.isWifiEnabled = !wifiManager.isWifiEnabled
+
+            if(wifiManager.isWifiEnabled){
+                wifiManager.isWifiEnabled = false
+                onOff.text = "Wifi On"
+            }
+            else {
+                wifiManager.isWifiEnabled = true
+                onOff.text = "Wifi Off"
+            }
         }
     }
 
