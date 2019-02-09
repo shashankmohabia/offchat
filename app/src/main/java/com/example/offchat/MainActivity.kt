@@ -14,6 +14,8 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.IOException
+import java.net.InetAddress
+import java.net.InetSocketAddress
 import java.net.ServerSocket
 import java.net.Socket
 
@@ -160,9 +162,18 @@ class MainActivity : AppCompatActivity() {
                 socket = serverSocket.accept()
 
             } catch (e: IOException) {
-
+                e.printStackTrace()
             }
+        }
+    }
 
+    class ClientClass(var hostAddress: String, var socket: Socket = Socket()) : Thread() {
+        override fun run() {
+            try {
+                socket.connect(InetSocketAddress(hostAddress, 8888), 500)
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
         }
     }
 }
