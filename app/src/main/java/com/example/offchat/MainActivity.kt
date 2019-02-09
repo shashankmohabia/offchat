@@ -52,4 +52,16 @@ class MainActivity : AppCompatActivity() {
         }
         broadcastReceiver = WifiDirectBroadcastReceiver(wifiP2pManager,wifiP2pChannel,this)
     }
+
+    /** register the BroadcastReceiver with the intent values to be matched  */
+    public override fun onResume() {
+        super.onResume()
+        broadcastReceiver = WifiDirectBroadcastReceiver(wifiP2pManager,wifiP2pChannel,this)
+        registerReceiver(broadcastReceiver, intentFilter)
+    }
+
+    public override fun onPause() {
+        super.onPause()
+        unregisterReceiver(broadcastReceiver)
+    }
 }
