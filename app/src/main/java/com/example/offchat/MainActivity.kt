@@ -13,6 +13,9 @@ import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.IOException
+import java.net.ServerSocket
+import java.net.Socket
 
 class MainActivity : AppCompatActivity() {
 
@@ -146,5 +149,20 @@ class MainActivity : AppCompatActivity() {
     public override fun onPause() {
         super.onPause()
         unregisterReceiver(broadcastReceiver)
+    }
+
+    class ServerClass : Thread() {
+        lateinit var socket: Socket
+        lateinit var serverSocket: ServerSocket
+        override fun run() {
+            try {
+                serverSocket = ServerSocket(8888)
+                socket = serverSocket.accept()
+
+            } catch (e: IOException) {
+
+            }
+
+        }
     }
 }
