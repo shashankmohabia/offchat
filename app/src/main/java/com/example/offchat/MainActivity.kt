@@ -115,19 +115,25 @@ class MainActivity : AppCompatActivity() {
 
             val adapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, deviceNameArray)
             peerListView.adapter = adapter
-
-            // If an AdapterView is backed by this data, notify it
-            // of the change. For instance, if you have a ListView of
-            // available peers, trigger an update.
-            //(listAdapter as WiFiPeerListAdapter).notifyDataSetChanged()
-
-            // Perform any other updates needed based on the new list of
-            // peers connected to the Wi-Fi P2P network.
         }
 
         if (peers.isEmpty()) {
             Log.d("shashank", "No devices found")
             return@PeerListListener
+        }
+    }
+
+    private val connectionListener = WifiP2pManager.ConnectionInfoListener { info ->
+
+        // InetAddress from WifiP2pInfo struct.
+        val groupOwnerAddress: String = info.groupOwnerAddress.hostAddress
+
+        // After the group negotiation, we can determine the group owner
+        // (server).
+        if (info.groupFormed && info.isGroupOwner) {
+            connectionStatus.text = "Host"
+        } else if (info.groupFormed) {
+            connectionStatus.text = "Client"
         }
     }
 
