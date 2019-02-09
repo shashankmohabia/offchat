@@ -1,11 +1,13 @@
 package com.example.offchat
-
 import android.content.Context
 import android.content.IntentFilter
 import android.net.wifi.WifiManager
+import android.net.wifi.p2p.WifiP2pDevice
 import android.net.wifi.p2p.WifiP2pManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.widget.ArrayAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -13,8 +15,11 @@ class MainActivity : AppCompatActivity() {
     lateinit var wifiManager: WifiManager
     lateinit var wifiP2pManager: WifiP2pManager
     lateinit var wifiP2pChannel: WifiP2pManager.Channel
-    lateinit var intentFilter:IntentFilter
+    lateinit var intentFilter: IntentFilter
     lateinit var broadcastReceiver: WifiDirectBroadcastReceiver
+
+    private val peers = mutableListOf<WifiP2pDevice>()
+    private val deviceNameArray = mutableListOf<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,13 +68,40 @@ class MainActivity : AppCompatActivity() {
             addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION)
             addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION)
         }
-        broadcastReceiver = WifiDirectBroadcastReceiver(wifiP2pManager,wifiP2pChannel,this)
+        broadcastReceiver = WifiDirectBroadcastReceiver(wifiP2pManager, wifiP2pChannel, this)
     }
 
-    /** register the BroadcastReceiver with the intent values to be matched  */
+    val peerListListener = WifiP2pManager.PeerListListener { peerList ->
+        val refreshedPeers = peerList.deviceList
+        if (refreshedPeers != peers) {
+            peers.clear()
+            peers.addAll(refreshedPeers)
+
+            for (device in refreshedPeers) {
+                deviceNameArray.add(device.deviceName)
+            }
+
+            val adapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, deviceNameArray)
+            peerListView.adapter = adapter
+
+            // If an AdapterView is backed by this data, notify it
+            // of the change. For instance, if you have a ListView of
+            // available peers, trigger an update.
+            //(listAdapter as WiFiPeerListAdapter).notifyDataSetChanged()
+
+            // Perform any other updates needed based on the new list of
+            // peers connected to the Wi-Fi P2P network.
+        }
+
+        if (peers.isEmpty()) {
+            Log.d("shashank", "No devices found")
+            return@PeerListListener
+        }
+    }
+
     public override fun onResume() {
         super.onResume()
-        broadcastReceiver = WifiDirectBroadcastReceiver(wifiP2pManager,wifiP2pChannel,this)
+        broadcastReceiver = WifiDirectBroadcastReceiver(wifiP2pManager, wifiP2pChannel, this)
         registerReceiver(broadcastReceiver, intentFilter)
     }
 

@@ -6,7 +6,7 @@ import android.content.Intent
 import android.net.wifi.p2p.WifiP2pManager
 import android.util.Log
 
-class WifiDirectBroadcastReceiver(manager: WifiP2pManager, channel: WifiP2pManager.Channel, activity: MainActivity) :
+class WifiDirectBroadcastReceiver(private var manager: WifiP2pManager, private var channel: WifiP2pManager.Channel, var activity: MainActivity) :
     BroadcastReceiver() {
     override fun onReceive(p0: Context?, intent: Intent?) {
         if (intent != null) {
@@ -20,6 +20,11 @@ class WifiDirectBroadcastReceiver(manager: WifiP2pManager, channel: WifiP2pManag
                     }
                 }
                 WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION -> {
+                    // Request available peers from the wifi p2p manager. This is an
+                    // asynchronous call and the calling activity is notified with a
+                    // callback on PeerListListener.onPeersAvailable()
+                    manager.requestPeers(channel, activity.peerListListener)
+                    Log.d("shashank", "P2P peers changed")
                 }
                 WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION -> {
                 }
