@@ -14,6 +14,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var wifiP2pManager: WifiP2pManager
     lateinit var wifiP2pChannel: WifiP2pManager.Channel
     lateinit var intentFilter:IntentFilter
+    lateinit var broadcastReceiver: WifiDirectBroadcastReceiver
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,5 +50,6 @@ class MainActivity : AppCompatActivity() {
             addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION)
             addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION)
         }
+        broadcastReceiver = WifiDirectBroadcastReceiver(wifiP2pManager,wifiP2pChannel,this)
     }
 }
