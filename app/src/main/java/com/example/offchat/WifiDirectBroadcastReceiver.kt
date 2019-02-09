@@ -3,10 +3,16 @@ package com.example.offchat
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.net.NetworkInfo
 import android.net.wifi.p2p.WifiP2pManager
 import android.util.Log
+import android.widget.Toast
 
-class WifiDirectBroadcastReceiver(private var manager: WifiP2pManager, private var channel: WifiP2pManager.Channel, var activity: MainActivity) :
+class WifiDirectBroadcastReceiver(
+    private var manager: WifiP2pManager,
+    private var channel: WifiP2pManager.Channel,
+    var activity: MainActivity
+) :
     BroadcastReceiver() {
     override fun onReceive(p0: Context?, intent: Intent?) {
         if (intent != null) {
@@ -27,6 +33,17 @@ class WifiDirectBroadcastReceiver(private var manager: WifiP2pManager, private v
                     Log.d("shashank", "P2P peers changed")
                 }
                 WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION -> {
+                    manager?.let { manager ->
+
+                        val networkInfo: NetworkInfo? = intent
+                            .getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO) as NetworkInfo
+
+                        if (networkInfo?.isConnected == true) {
+                            manager.requestConnectionInfo(channel, activity.connectionListener)
+                        }else{
+                            Log.d("shashank", "Device Disconnected")
+                        }
+                    }
                 }
                 WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION -> {
                 }

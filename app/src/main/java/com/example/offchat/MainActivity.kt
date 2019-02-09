@@ -123,7 +123,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private val connectionListener = WifiP2pManager.ConnectionInfoListener { info ->
+    val connectionListener = WifiP2pManager.ConnectionInfoListener { info ->
 
         // InetAddress from WifiP2pInfo struct.
         val groupOwnerAddress: String = info.groupOwnerAddress.hostAddress
