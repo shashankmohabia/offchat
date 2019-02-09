@@ -1,13 +1,17 @@
 package com.example.offchat
+
 import android.content.Context
 import android.content.IntentFilter
 import android.net.wifi.WifiManager
+import android.net.wifi.WpsInfo
+import android.net.wifi.p2p.WifiP2pConfig
 import android.net.wifi.p2p.WifiP2pDevice
 import android.net.wifi.p2p.WifiP2pManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -53,6 +57,34 @@ class MainActivity : AppCompatActivity() {
 
                 override fun onFailure(reasonCode: Int) {
                     connectionStatus.text = "Discovery Failed"
+                }
+            })
+        }
+
+        peerListView.setOnItemClickListener { adapterView, view, i, l ->
+            val device = peers[i]
+            val config = WifiP2pConfig().apply {
+                deviceAddress = device.deviceAddress
+                wps.setup = WpsInfo.PBC
+            }
+
+
+            wifiP2pManager.connect(wifiP2pChannel, config, object : WifiP2pManager.ActionListener {
+
+                override fun onSuccess() {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Connect to ${device.deviceName}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                override fun onFailure(reason: Int) {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Connect failed. Retry.",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             })
         }
