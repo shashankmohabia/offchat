@@ -16,9 +16,13 @@ class WifiDirectBroadcastReceiver(
     var activity: MainActivity
 ) :
     BroadcastReceiver() {
+
     override fun onReceive(p0: Context?, intent: Intent?) {
+
         if (intent != null) {
+
             when (intent.action) {
+
                 WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION -> {
                     val state = intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, -1)
                     if (state == WifiP2pManager.WIFI_P2P_STATE_ENABLED) {
@@ -27,6 +31,7 @@ class WifiDirectBroadcastReceiver(
                         Log.d("shashank", "Wifi Off")
                     }
                 }
+
                 WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION -> {
                     // Request available peers from the wifi p2p manager. This is an
                     // asynchronous call and the calling activity is notified with a
@@ -34,6 +39,7 @@ class WifiDirectBroadcastReceiver(
                     manager.requestPeers(channel, activity.peerListListener)
                     Log.d("shashank", "P2P peers changed")
                 }
+
                 WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION -> {
                     manager.let { manager ->
 
@@ -47,6 +53,7 @@ class WifiDirectBroadcastReceiver(
                         }
                     }
                 }
+
                 WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION -> {
                 }
             }

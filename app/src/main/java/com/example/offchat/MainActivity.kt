@@ -14,7 +14,6 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.IOException
-import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.ServerSocket
 import java.net.Socket
@@ -38,6 +37,19 @@ class MainActivity : AppCompatActivity() {
 
         setupOnclickListeners()
 
+    }
+
+    private fun init() {
+        wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        wifiP2pManager = getSystemService(Context.WIFI_P2P_SERVICE) as WifiP2pManager
+        wifiP2pChannel = wifiP2pManager.initialize(this, mainLooper, null)
+        intentFilter = IntentFilter().apply {
+            addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION)
+            addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION)
+            addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION)
+            addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION)
+        }
+        broadcastReceiver = WifiDirectBroadcastReceiver(wifiP2pManager, wifiP2pChannel, this)
     }
 
     private fun setupOnclickListeners() {
@@ -73,7 +85,6 @@ class MainActivity : AppCompatActivity() {
                 wps.setup = WpsInfo.PBC
             }
 
-
             wifiP2pManager.connect(wifiP2pChannel, config, object : WifiP2pManager.ActionListener {
 
                 override fun onSuccess() {
@@ -95,24 +106,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun init() {
-        wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-        wifiP2pManager = getSystemService(Context.WIFI_P2P_SERVICE) as WifiP2pManager
-        wifiP2pChannel = wifiP2pManager.initialize(this, mainLooper, null)
-        intentFilter = IntentFilter().apply {
-            addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION)
-            addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION)
-            addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION)
-            addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION)
-        }
-        broadcastReceiver = WifiDirectBroadcastReceiver(wifiP2pManager, wifiP2pChannel, this)
-    }
-
     val peerListListener = WifiP2pManager.PeerListListener { peerList ->
         val refreshedPeers = peerList.deviceList
         if (refreshedPeers != peers) {
             peers.clear()
             peers.addAll(refreshedPeers)
+
+            deviceNameArray.clear()
 
             for (device in refreshedPeers) {
                 deviceNameArray.add(device.deviceName)
