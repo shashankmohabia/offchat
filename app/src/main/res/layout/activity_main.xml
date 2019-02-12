@@ -35,7 +35,7 @@
             android:text="Message"
             android:textAlignment="center"
             android:textSize="20sp"
-            android:textStyle="italic" />
+            android:textStyle="italic"/>
 
     <EditText
             android:id="@+id/writeMsg"

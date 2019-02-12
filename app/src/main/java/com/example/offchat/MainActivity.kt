@@ -9,6 +9,8 @@ import android.net.wifi.p2p.WifiP2pDevice
 import android.net.wifi.p2p.WifiP2pManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Message
 import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.Toast
@@ -28,6 +30,10 @@ class MainActivity : AppCompatActivity() {
 
     private val peers = mutableListOf<WifiP2pDevice>()
     private val deviceNameArray = mutableListOf<String>()
+
+    companion object {
+        val MESSAGE_READ = 1
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,8 +72,7 @@ class MainActivity : AppCompatActivity() {
                         connectionStatus.text = "Discovery Failed"
                     }
                 })
-            }
-            else{
+            } else {
                 Toast.makeText(this, "Connect to a network", Toast.LENGTH_SHORT).show()
             }
         }
@@ -135,6 +140,18 @@ class MainActivity : AppCompatActivity() {
             connectionStatus.text = "Client"
         }
     }
+
+
+    val handler = Handler(Handler.Callback {
+        when (it.what) {
+            MESSAGE_READ -> {
+                val readbuff = it.obj as ByteArray
+                val tempmsg = String(readbuff, 0, it.arg1)
+                readMsg.text = tempmsg
+            }
+        }
+        true
+    })
 
     public override fun onResume() {
         super.onResume()
