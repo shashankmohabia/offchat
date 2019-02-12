@@ -54,17 +54,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupOnclickListeners() {
 
-        onOff.setOnClickListener {
-
-            if (wifiManager.isWifiEnabled) {
-                wifiManager.isWifiEnabled = false
-                onOff.text = "Wifi On"
-            } else {
-                wifiManager.isWifiEnabled = true
-                onOff.text = "Wifi Off"
-            }
-        }
-
         discover.setOnClickListener {
             if (wifiManager.isWifiEnabled) {
                 wifiP2pManager.discoverPeers(wifiP2pChannel, object : WifiP2pManager.ActionListener {

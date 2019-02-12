@@ -7,21 +7,12 @@
     tools:context=".MainActivity">
 
     <Button
-            android:id="@+id/onOff"
-            android:layout_width="wrap_content"
+            android:id="@+id/discover"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_marginStart="28dp"
             android:layout_marginTop="55dp"
-            android:text="Wifi On" />
-    <Button
-            android:id="@+id/discover"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/onOff"
-            android:layout_alignBottom="@+id/onOff"
-            android:layout_centerHorizontal="true"
             android:text="discover" />
 
     <ListView
@@ -29,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:layout_alignParentStart="true"
-            android:layout_below="@+id/onOff"
+            android:layout_below="@+id/discover"
             android:layout_marginTop="25dp"
             android:background="@android:color/holo_orange_light" />
 
