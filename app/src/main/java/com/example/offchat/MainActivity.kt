@@ -66,16 +66,21 @@ class MainActivity : AppCompatActivity() {
         }
 
         discover.setOnClickListener {
-            wifiP2pManager.discoverPeers(wifiP2pChannel, object : WifiP2pManager.ActionListener {
+            if (wifiManager.isWifiEnabled) {
+                wifiP2pManager.discoverPeers(wifiP2pChannel, object : WifiP2pManager.ActionListener {
 
-                override fun onSuccess() {
-                    connectionStatus.text = "Discovery Started"
-                }
+                    override fun onSuccess() {
+                        connectionStatus.text = "Discovery Started"
+                    }
 
-                override fun onFailure(reasonCode: Int) {
-                    connectionStatus.text = "Discovery Failed"
-                }
-            })
+                    override fun onFailure(reasonCode: Int) {
+                        connectionStatus.text = "Discovery Failed"
+                    }
+                })
+            }
+            else{
+                Toast.makeText(this, "Connect to a network", Toast.LENGTH_SHORT).show()
+            }
         }
 
         peerListView.setOnItemClickListener { adapterView, view, i, l ->
