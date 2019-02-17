@@ -15,7 +15,7 @@ import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
-import java.io.IOException
+import java.io.*
 import java.net.InetSocketAddress
 import java.net.ServerSocket
 import java.net.Socket
@@ -28,11 +28,16 @@ class MainActivity : AppCompatActivity() {
     lateinit var intentFilter: IntentFilter
     lateinit var broadcastReceiver: WifiDirectBroadcastReceiver
 
+    lateinit var serverclass:ServerClass
+    lateinit var clientClass: ClientClass
+    lateinit var sendReceive: SendReceive
+
     private val peers = mutableListOf<WifiP2pDevice>()
     private val deviceNameArray = mutableListOf<String>()
 
     companion object {
         val MESSAGE_READ = 1
+        val instance = MainActivity()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,6 +80,11 @@ class MainActivity : AppCompatActivity() {
             } else {
                 Toast.makeText(this, "Connect to a network", Toast.LENGTH_SHORT).show()
             }
+        }
+
+        sendButton.setOnClickListener {
+            val msg = writeMsg.text.toString()
+            sendReceive.write(msg.toByteArray())
         }
 
         peerListView.setOnItemClickListener { adapterView, view, i, l ->
@@ -136,13 +146,43 @@ class MainActivity : AppCompatActivity() {
         // (server).
         if (info.groupFormed && info.isGroupOwner) {
             connectionStatus.text = "Host"
+            serverclass = ServerClass()
+            serverclass.start()
         } else if (info.groupFormed) {
             connectionStatus.text = "Client"
+            clientClass = ClientClass(groupOwnerAddress)
+            clientClass.start()
         }
     }
 
+    class ServerClass : Thread() {
+        lateinit var socket: Socket
+        lateinit var serverSocket: ServerSocket
+        override fun run() {
+            try {
+                serverSocket = ServerSocket(8888)
+                socket = serverSocket.accept()
+                instance.sendReceive = SendReceive(socket)
+                instance.sendReceive.start()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+    }
 
-    val handler = Handler(Handler.Callback {
+    class ClientClass(var hostAddress: String, var socket: Socket = Socket()) : Thread() {
+        override fun run() {
+            try {
+                socket.connect(InetSocketAddress(hostAddress, 8888), 500)
+                instance.sendReceive = SendReceive(socket)
+                instance.sendReceive.start()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    var handler = Handler(Handler.Callback {
         when (it.what) {
             MESSAGE_READ -> {
                 val readbuff = it.obj as ByteArray
@@ -152,6 +192,37 @@ class MainActivity : AppCompatActivity() {
         }
         true
     })
+
+    class SendReceive(
+        var socket: Socket?,
+        var inputStream: InputStream = socket!!.getInputStream(),
+        var outputStream: OutputStream = socket!!.getOutputStream()
+    ) : Thread() {
+        override fun run() {
+            super.run()
+            val buffer = ByteArray(1024)
+            var bytes: Int
+            while (socket != null) {
+                try {
+                    bytes = inputStream.read(buffer)
+                    if (bytes > 0) {
+                        instance.handler.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
+                    }
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+            }
+
+        }
+
+        fun write(bytes: ByteArray) {
+            try {
+                outputStream.write(bytes)
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+    }
 
     public override fun onResume() {
         super.onResume()
@@ -164,27 +235,4 @@ class MainActivity : AppCompatActivity() {
         unregisterReceiver(broadcastReceiver)
     }
 
-    class ServerClass : Thread() {
-        lateinit var socket: Socket
-        lateinit var serverSocket: ServerSocket
-        override fun run() {
-            try {
-                serverSocket = ServerSocket(8888)
-                socket = serverSocket.accept()
-
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-        }
-    }
-
-    class ClientClass(var hostAddress: String, var socket: Socket = Socket()) : Thread() {
-        override fun run() {
-            try {
-                socket.connect(InetSocketAddress(hostAddress, 8888), 500)
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-        }
-    }
 }
